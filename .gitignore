@@ -1,0 +1,33 @@
+# ==================================
+# .gitignore for Go + Caddy Project
+# ==================================
+
+# Build output directory
+# 我们所有的编译产物都在这里，绝对不能提交
+dist/
+
+# Binaries compiled in the root directory
+# 防止 "make build" 的产物被意外提交
+caddy
+caddy.exe
+
+# IDE-specific files
+.idea/
+.vscode/
+*.iml
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Nacos SDK cache and log files
+# 我们的代码中指定了这些临时目录
+/tmp/nacos/
+
+# Go workspace file checksums
+# go.work 文件本身应该被提交，因为它定义了开发环境，但 sum 文件是本地的
+go.work.sum
+
+# Go build cache
+*.test
+*.prof

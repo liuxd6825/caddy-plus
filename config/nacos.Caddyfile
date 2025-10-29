@@ -1,0 +1,75 @@
+# 全局配置块
+{
+    # 在调试这种复杂路由时，强烈建议开启 debug 日志。
+    # 你将能清晰地看到 Caddy 选择了哪个路由，以及各个服务发现提供者的日志。
+    debug
+}
+
+# 你的主 API 网关域名
+api.example.com {
+
+    # ------------------------------------------------------------------
+    # 规则 1: 路由到 Nacos 的 "user-service"
+    # 匹配所有 /api/v1/user/ 开头的请求
+    # ------------------------------------------------------------------
+    handle_path /api/v1/user/* {
+        # 使用我们的动态服务发现模块
+        reverse_proxy {
+            dynamic_sd {
+                # 指定使用 nacos 提供者
+                provider nacos {
+                    # [必填] 替换为你的 Nacos 服务器地址和端口
+                    server_addr  "127.0.0.1"
+                    server_port  8848
+
+                    # [必填] 要发现的服务名称
+                    service_name "user-service"
+
+                    # [可选] 替换为你的 Nacos 命名空间 ID
+                    namespace_id "your-nacos-namespace-id"
+                }
+            }
+        }
+    }
+
+    # ------------------------------------------------------------------
+    # 规则 2: 路由到 Consul 的 "master-service"
+    # 匹配所有 /api/v1/master/ 开头的请求
+    # ------------------------------------------------------------------
+    handle_path /api/v1/master/* {
+        reverse_proxy {
+            dynamic_sd {
+                # 指定使用 consul 提供者
+                provider consul {
+                    # [可选] 替换为你的 Consul agent 地址，默认为 "127.0.0.1:8500"
+                    address "127.0.0.1:8500"
+
+                    # [必填] 要发现的服务名称
+                    service_name "master-service"
+                }
+            }
+        }
+    }
+
+    # ------------------------------------------------------------------
+    # 规则 3: 路由到 mDNS 的 "system-service"
+    # 匹配所有 /api/v1/sys/ 开头的请求
+    # ------------------------------------------------------------------
+    handle_path /api/v1/sys/* {
+        reverse_proxy {
+            dynamic_sd {
+                # 指定使用 mdns 提供者
+                provider mdns {
+                    # [必填] mDNS 的服务类型
+                    # 注意：这通常不是一个简单的名字，而是遵循 <_服务>.<_协议> 的格式
+                    service_name "_system-service._tcp"
+                }
+            }
+        }
+    }
+
+    # (可选) 可以添加一个默认的响应，用于处理所有其他未匹配的 API 请求
+    handle {
+        respond "No route configured for this path" 404
+    }
+}
