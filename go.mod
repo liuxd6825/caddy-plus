@@ -179,6 +179,3 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	howett.net/plist v1.0.0 // indirect
 )
-
-// 👇 这就是新添加的、解决问题的关键一行！
-replace github.com/liuxd6825/caddy-plus => ./
